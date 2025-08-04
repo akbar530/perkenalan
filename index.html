@@ -99,7 +99,7 @@
       justify-content: center;
       gap: 30px;
       position: relative;
-      top: -20px; /* Naikkan footer sedikit */
+      top: -20px;
     }
 
     footer a {
@@ -167,7 +167,6 @@
     .gallery img {
       width: 100%;
       border-radius: 15px;
-      transition: transform 0.3s, box-shadow 0.3s;
       cursor: pointer;
       box-shadow: 0 0 15px rgba(255,0,0,0.2);
       opacity: 0;
@@ -221,6 +220,28 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tombol Musik */
+    #music-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: 2px solid rgba(255,0,0,0.5);
+      background: rgba(255,0,0,0.2);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1001;
+      transition: 0.3s;
+      opacity: 1;
+    }
+    #music-toggle:hover {
+      background: rgba(255,0,0,0.5);
+      border-color: rgba(255,0,0,0.9);
+      box-shadow: 0 0 15px rgba(255,0,0,0.6);
     }
   </style>
 </head>
@@ -282,6 +303,12 @@
     <img id="fullscreen-img" src="">
   </div>
 
+  <!-- Musik Latar -->
+  <audio id="bg-music" loop>
+    <source src="musik.mp3" type="audio/mpeg">
+  </audio>
+  <button id="music-toggle">▶️ Musik</button>
+
   <script>
     function showSection(id) {
       document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
@@ -308,24 +335,46 @@
       if (e.target === fullscreen) tutupFullscreen();
     });
 
-    // Hide nav when scrolling in Galeri, show only at top
+    // Musik toggle
+    const bgMusic = document.getElementById('bg-music');
+    const toggleBtn = document.getElementById('music-toggle');
     const navbar = document.getElementById('navbar');
+    let isPlaying = false;
+
+    toggleBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        bgMusic.pause();
+        toggleBtn.textContent = '▶️ Musik';
+      } else {
+        bgMusic.play();
+        toggleBtn.textContent = '⏸ Musik';
+      }
+      isPlaying = !isPlaying;
+    });
+
+    // Hilangkan tombol musik saat scroll di galeri
     window.addEventListener('scroll', () => {
       const currentScroll = window.scrollY;
       const galeriActive = document.getElementById('galeri').classList.contains('active');
 
       if (galeriActive) {
         if (currentScroll > 50) {
-          navbar.classList.add('hidden'); // Hide when scrolled down
+          navbar.classList.add('hidden');
+          toggleBtn.style.opacity = '0';
+          toggleBtn.style.pointerEvents = 'none';
         } else {
-          navbar.classList.remove('hidden'); // Show again only at top
+          navbar.classList.remove('hidden');
+          toggleBtn.style.opacity = '1';
+          toggleBtn.style.pointerEvents = 'auto';
         }
       } else {
-        navbar.classList.remove('hidden'); // Always show in Tentang
+        navbar.classList.remove('hidden');
+        toggleBtn.style.opacity = '1';
+        toggleBtn.style.pointerEvents = 'auto';
       }
     });
 
-    // Efek muncul gambar galeri saat terlihat
+    // Efek muncul gambar galeri
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
