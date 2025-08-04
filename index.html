@@ -223,10 +223,9 @@
     }
 
     /* Tombol Musik */
-    #music-toggle {
+    #music-toggle, #skip-music {
       position: fixed;
       bottom: 20px;
-      right: 20px;
       padding: 10px 20px;
       border-radius: 20px;
       border: 2px solid rgba(255,0,0,0.5);
@@ -238,11 +237,14 @@
       transition: 0.3s;
       opacity: 1;
     }
-    #music-toggle:hover {
+    #music-toggle:hover, #skip-music:hover {
       background: rgba(255,0,0,0.5);
       border-color: rgba(255,0,0,0.9);
       box-shadow: 0 0 15px rgba(255,0,0,0.6);
     }
+
+    #music-toggle { right: 20px; }
+    #skip-music { right: 120px; }
   </style>
 </head>
 <body>
@@ -304,10 +306,9 @@
   </div>
 
   <!-- Musik Latar -->
-  <audio id="bg-music" loop>
-    <source src="musik.mp3" type="audio/mpeg">
-  </audio>
+  <audio id="bg-music"></audio>
   <button id="music-toggle">▶️ Musik</button>
+  <button id="skip-music">⏭ Skip</button>
 
   <script>
     function showSection(id) {
@@ -335,21 +336,41 @@
       if (e.target === fullscreen) tutupFullscreen();
     });
 
-    // Musik toggle
+    // Musik toggle & skip
     const bgMusic = document.getElementById('bg-music');
     const toggleBtn = document.getElementById('music-toggle');
+    const skipBtn = document.getElementById('skip-music');
     const navbar = document.getElementById('navbar');
+
+    const playlist = ['musik.mp3', 'musik2.mp3', 'musik3.mp3'];
+    let currentTrack = 0;
     let isPlaying = false;
+
+    function playMusic() {
+      bgMusic.src = playlist[currentTrack];
+      bgMusic.play();
+      toggleBtn.textContent = '⏸ Musik';
+      isPlaying = true;
+    }
 
     toggleBtn.addEventListener('click', () => {
       if (isPlaying) {
         bgMusic.pause();
         toggleBtn.textContent = '▶️ Musik';
+        isPlaying = false;
       } else {
-        bgMusic.play();
-        toggleBtn.textContent = '⏸ Musik';
+        playMusic();
       }
-      isPlaying = !isPlaying;
+    });
+
+    skipBtn.addEventListener('click', () => {
+      currentTrack = (currentTrack + 1) % playlist.length;
+      playMusic();
+    });
+
+    bgMusic.addEventListener('ended', () => {
+      currentTrack = (currentTrack + 1) % playlist.length;
+      playMusic();
     });
 
     // Hilangkan tombol musik saat scroll di galeri
@@ -362,15 +383,21 @@
           navbar.classList.add('hidden');
           toggleBtn.style.opacity = '0';
           toggleBtn.style.pointerEvents = 'none';
+          skipBtn.style.opacity = '0';
+          skipBtn.style.pointerEvents = 'none';
         } else {
           navbar.classList.remove('hidden');
           toggleBtn.style.opacity = '1';
           toggleBtn.style.pointerEvents = 'auto';
+          skipBtn.style.opacity = '1';
+          skipBtn.style.pointerEvents = 'auto';
         }
       } else {
         navbar.classList.remove('hidden');
         toggleBtn.style.opacity = '1';
         toggleBtn.style.pointerEvents = 'auto';
+        skipBtn.style.opacity = '1';
+        skipBtn.style.pointerEvents = 'auto';
       }
     });
 
